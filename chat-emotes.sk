@@ -1,0 +1,9 @@
+on chat:
+    if message contains ":lenny:":
+             replace all "on chat:
+    if message contains ":lenny:":
+             replace all ":lenny:" with "&b( ° ?? °)&on chat:
+    if message contains ":lenny:":
+             replace all ":lenny:" with "&b( ° ?? °)&f":lenny:" with "&b( ° ?? °)&f"
+             
+- Pretty self explanatory. Player says ":lenny:" in chat. Autocorrection to this.
