@@ -1,0 +1,44 @@
+options:
+    TOGGLE-SOUND: "BLOCK_NOTE_PLING"
+    KILL-SOUND: "ENTITY_EXPERIENCE_ORB_PICKUP"
+    DEATH-SOUND: "ENTITY_VILLAGER_HURT"
+
+command /showdeaths:
+    trigger:
+        if {%player%::showdeaths} is not set:
+            set {%player%::showdeaths} to 0
+        if {%player%::showdeaths} is 0:
+            set {%player%::showdeaths} to 1
+            send "&6Deaths &7» &edeath messages &a&lEnabled" to player
+            sound({@TOGGLE-SOUND}, 1, 2, player)
+        else if {%player%::showdeaths} is 1:
+            set {%player%::showdeaths} to 0
+            send "&6Deaths &7» &edeath messages &c&lDisabled" to player
+            sound({@TOGGLE-SOUND}, 1, 1, player)
+
+on death of player:
+    if attacker is a player:
+        add 1 to {kills::%attacker%}
+        add 1 to {deaths::%victim%}
+        send "&a&lKills! &6you killed &c%victim%" to attacker
+        send "&c&lDeath! &6you were killed by &c%attacker%" to victim
+        sound({@KILL-SOUND}, 1, 1, attacker)
+        sound({@DEATH-SOUND}, 1, 1, victim)
+        loop all players:
+            if loop-player is attacker or victim:
+                stop
+            else:
+                if {%loop-player%::showdeaths} is 1:
+                    send "&6Deaths &7» &6%victim% &ewas killed by &6%attacker%" to loop-player
+    else if damage cause is void:
+        add 1 to {deaths::%victim%}
+        send "&c&lDeath! &eyou were consumed by the void" to victim
+        sound({@DEATH-SOUND}, 1, 1, victim)
+    else if damage cause is fire, lava or burning:
+        add 1 to {deaths::%victim%}
+        send "&c&lDeath! &eyou were burnt to a crisp" to victim
+        sound({@DEATH-SOUND}, 1, 1, victim)
+
+function sound(sound: text, vol: number, pitch: number, p: players):
+    loop {_p::*}:
+        play sound {_sound} with volume {_vol} and pitch {_pitch} at loop-value for loop-value
