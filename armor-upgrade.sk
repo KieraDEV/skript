@@ -1,0 +1,23 @@
+command /armorshopgui:
+	permission: shopgui.armor
+	permission message: "&cNo Permission!"
+	trigger:
+		open chest with 3 rows named "&cArmor Blacksmith" to player
+		if player is holding helmet:
+			make player execute command "/upgradeguiarmor"
+		else:
+			format slot 10 of player with leather helmet named "&bLeather Helmet" with lore "&7Cost $7500000" to close then run [execute console command "/armor %player% 1"]
+			format slot 12 of player with leather chestplate named "&bLeather Chestplate" with lore "&7Cost $25000000" to close then run [execute console command "/armor %player% 2"]
+			format slot 14 of player with leather leggings named "&bLeather Leggings" with lore "&7Cost $17500000" to close then run [execute console command "/armor %player% 3"]
+			format slot 16 of player with leather boots named "&bLeather Boots" with lore "&7Cost $10000000" to close then run [execute console command "/armor %player% 4"]
+
+command /upgradeguiarmor:
+	permission: armorguistuff.armor
+	permission message: "&cNo Permission!"
+	trigger:
+		open chest with 3 rows named "&cArmor Blacksmith" to player
+		format slot 10 of player with diamond chestplate named "&b+1 Protection" with lore "&7Cost $%25000000 + 52500000* level of enchantment protection of tool of player%" to close then run [execute console command "/armorupgrade %player% 1"]
+		format slot 12 of player with vines named "&b+1 Thorns" with lore "&7Cost $%55000000 + 75000000 * level of enchantment thorns of tool of player%" to close then run [execute console command "/armorupgrade %player% 2"]
+		format slot 14 of player with blaze powder named "&b+1 Fire Protection" with lore "&7Cost $%25000000 + 52500000* level of enchantment fire protection of tool of player%" to close then run [execute console command "/armorupgrade %player% 3"]
+    
+    - This does not include the core since this was attempted to be stolen lol.
