@@ -1,3 +1,5 @@
+# Commission for MineEdge 2019
+
 command /prestige:
 	trigger:
 		set {_rebirthprestige} to {Rebirths.%player%} * 100
