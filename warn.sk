@@ -63,9 +63,9 @@ command /check [<offline player>]:
     permission message: &cInsufficient Permissions.
     trigger:
         if argument 1 is not set:
-            send "&c&lMineEdge &8» &7Please specify a player to check."
+            send "&c&Check &8» &7Please specify a player to check."
         else:
-            send "&c&lMineEdge &8» &7Showing information for &c%arg-1%&7:"
+            send "&c&Check &8» &7Showing information for &c%arg-1%&7:"
             send ""
             if {warns.%arg-1%} is greater than 0:
                 send "&cWarnings: &f%{warns.%arg-1%}%"
