@@ -14,3 +14,4 @@ command /punish [<offline player>] <string>:
             format slot 32 of player with book named "&5Mute" with lore "||&rClick to mute %arg-1%'s||&rFor %arg-2%." to close then run [make player execute "mute %arg-1% %arg-2%"]
             
 - This is outdated and formated with TuSKe. But still cool when it was active.
+- Just a fancy gui with times, relied off Essentials
