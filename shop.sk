@@ -1,0 +1,117 @@
+command /shop:
+    trigger:
+        send "&4&lDigging &8&l? &fOpening shop..."
+        open chest inventory with 4 rows named "&4&lDigging &8&l? &cShop" to player
+        set {_bal} to "%player's balance%"
+        replace all "$" in {_bal} with ""
+        set slot 4 of player's current inventory to sunflower named "&cUsername&8: &f%player%" with lore "&cBalance&8: &2$&a%{_bal}%"
+        set slot 20 of player's current inventory to diamond pickaxe named "&4Shop &8| &cPickaxes/Swords" with lore "&7||&8(&4*&8) &fLeft-Click to open this shop!"
+        set slot 24 of player's current inventory to name tag named "&4Shop &8| &cMiscellaneous &7(COMING SOON)" with lore "&7||&8(&4*&8) &fLeft-Click to open this shop!||&7"
+
+on inventory click:
+    if name of event-inventory is "&c&lMine&7&lEdge &8&l? &cShop":
+        cancel event
+        if index of event-slot is 20:
+            open chest inventory with 5 rows named "&4&lShop &8&l? &cPickaxes/Swords" to player
+            set slot 0 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 1 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 2 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 3 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 4 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 5 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 6 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 7 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 8 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 9 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 17 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 18 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 26 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 27 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 35 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 36 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 37 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 38 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 39 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 40 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 41 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 42 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 43 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 44 of player's current inventory to gray glass named "&8<&7?&8>"
+            set slot 11 of player's current inventory to wood pickaxe named "&4Wooden Pickaxe" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$0"
+            set slot 12 of player's current inventory to stone pickaxe named "&7Stone Pickaxe" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$750"
+            set slot 14 of player's current inventory to iron pickaxe named "&fIron Pickaxe" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$10,000"
+            set slot 15 of player's current inventory to diamond pickaxe named "&bDiamond Pickaxe" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$25,000"
+            set slot 29 of player's current inventory to wood sword named "&4Wooden Sword" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$0"
+            set slot 30 of player's current inventory to stone sword named "&7Stone Sword" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$15,000"
+            set slot 32 of player's current inventory to iron sword named "&fIron Sword" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$35,000"
+            set slot 33 of player's current inventory to diamond sword named "&bDiamond Sword" with lore "&7||&4 - &fLeft-Click buy!||&7||&4 - &fPrice &8&l? &a$50,000"
+
+on inventory click:
+    if name of event-inventory is "&4&lShop &8&l? &cPickaxes/Swords":
+        cancel event
+        if index of event-slot is 11:
+            if player's balance >= 0:
+                remove 0 from player's money
+                give 1 wooden pickaxe to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cWooden Pickaxe&f for &cFree&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 12:
+            if player's balance >= 750:
+                remove 750 from player's money
+                give 1 stone pickaxe to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cStone Pickaxe&f for &c$750&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 14:
+            if player's balance >= 10000:
+                remove 10000 from player's money
+                give 1 iron pickaxe to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cIron Pickaxe&f for &c$10,000&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 15:
+            if player's balance >= 25000:
+                remove 25000 from player's money
+                give 1 diamond pickaxe to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cDiamond Pickaxe&f for &c$25,000&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 29:
+            if player's balance >= 0:
+                remove 0 from player's money
+                give 1 wooden sword to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cWooden Sword&f for &cFree&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 30:
+            if player's balance >= 15000:
+                remove 15000 from player's money
+                give 1 stone sword to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cStone Sword&f for &c15,000&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 32:
+            if player's balance >= 325000:
+                remove 35000 from player's money
+                give 1 iron sword to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cIron Sword&f for &c35,000&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+        if index of event-slot is 33:
+            if player's balance >= 50000:
+                remove 50000 from player's money
+                give 1 diamond sword to player
+                send "&4&lDigging &8&l? &fSuccessfully purchased &cDiamond Sword&f for &c50,000&f!"
+            else:
+                close player's inventory
+                send "&4&lDigging &8&l? &cYou don't have enough money!"
+                
+- Shop commission for Digging.minehut.gg
