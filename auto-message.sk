@@ -1,0 +1,13 @@
+options:
+    
+    version : 1.0
+
+every 75 seconds:
+
+ broadcast "wow distray you're so cool"
+ 
+#==========#
+
+every 100 seconds:
+
+ broadcast "navalabs.net"
