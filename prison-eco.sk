@@ -1,0 +1,179 @@
+command /prestige:
+	trigger:
+		set {_rebirthprestige} to {Rebirths.%player%} * 100
+		if player is holding a diamond pickaxe:
+			if level of enchantment fortune of tool of player + level of enchantment efficiency of tool of player > 599 + {_rebirthprestige}:
+				set {_prestigecost} to {Prestiges.%player%} * 2
+				set {_prestigecost} to {_prestigecost} + 1
+				set {_rebirthplusprestige} to {Rebirths.%player%} + 1
+				if player's balance >= {_prestigecost} * 250000000 * {_rebirthplusprestige}:
+					if {readyprestige.%player%} > 0:	
+						clear player's inventory
+						reset player's balance
+						add 1 to {Prestiges.%player%}
+						set {multiplier.%player%} to 1
+						broadcast "&e[Prestiges] &f%player% have prestiged to %{Prestiges.%player%}%!"
+						make player execute command "/start"
+					else:
+						send "&e[Prestiges] &fIf you prestige, you will get a .25 multiplier. (WARNING: RESETS BALANCE AND INVENTORY!) Type again to prestige!"
+						set {readyprestige.%player%} to 1
+						wait 5 seconds
+						set {readyprestige.%player%} to 0
+				else:
+					send "&e[Prestiges] &fYou do not have enough money! You need $%{_prestigecost} * 250000000 - player's balance% more!"
+			else:
+				send "&e[Prestiges] &fYou do not have the best pick!"
+		else:
+			send "&e[Prestiges] &fHold the diamond pickaxe to prestige!"
+
+variables:
+    {multiplier::%player%} = 1
+    {global::multiplier} = 1
+    {donormulti::%player%} = 0
+
+command /setworth [<text>] [<number>]:
+    permission: mineedge.setworth
+    permission message: '&cYou do not have permission!'
+    trigger:
+        if arg-1 is set:
+            if arg-2 > 0:
+                if {price::*} contains arg-1:
+                    set {price::%arg-1%} to arg-2
+                    send "&cYou have set %arg-1% to $%arg-2%"
+                else:
+                    add arg-1 to {price::*}
+                    set {price::%arg-1%} to arg-2
+                    send "&cYou have set %arg-1% to $%arg-2%"
+            else if arg-2 <= 0:
+                send "&cYou have reset %arg-1%'s price!"
+                remove arg-1 from {price::*}
+                clear {price::%arg-1%}
+            else:
+                send "&cIncorrect Usage! /setworth (item) (price)"
+        else:
+            send "&cIncorrect Usage! /setworth (item) (price)"
+
+command /autosell:
+    permission: autosell.sell
+    permission message: "&cYou do not have permission for this!"
+    trigger:
+        if {autosell.%player%} = 1:
+            set {autosell.%player%} to 0
+            send "&c[AutoSell] &fYou have disabled autosell!"
+        else:
+            set {autosell.%player%} to 1
+            send "&c[Autosell] &fYou have enabled autosell!"
+
+on join:
+    set {autosell.%player%} to 0
+
+on mine:
+    if {autosell.%player%} = 1:
+        set {items.%player%} to 0
+        set {price.%player%} to 0
+        loop {price::*}:
+            set {_items} to "%loop-value%" parsed as item
+            add the amount of {_items} in player's inventory to {items.%player%}
+            set {_multi} to {multiplier::%player%} + {donormulti::%player%} + {staffmulti::%player%} + 0.25*{Prestiges.%player%} + 100*{Rebirths.%player%}
+            set {_multi} to {_multi} * {global::multiplier}
+            add the amount of {_items} in player's inventory * {price::%loop-value%} * {_multi} * 0.9 to {price.%player%}
+            remove all {_items} from player's inventory
+        wait 1 tick
+        if {items.%player%} > 0:
+            set action bar of player to "&c[Autosell] &fYou have sold your items for $%{price.%player%}%!"
+            add {price.%player%} to player's balance
+
+command /sell:
+    trigger:
+        set {items.%player%} to 0
+        set {price.%player%} to 0
+        loop {price::*}:
+            set {_items} to "%loop-value%" parsed as item
+            add the amount of {_items} in player's inventory to {items.%player%}
+            set {_multi} to {multiplier::%player%} + {donormulti::%player%} + {staffmulti::%player%} + 0.25*{Prestiges.%player%} + 100*{Rebirths.%player%}
+            set {_multi} to {_multi} * {global::multiplier}
+            add the amount of {_items} in player's inventory * {price::%loop-value%} * {_multi} to {price.%player%}
+            remove all {_items} from player's inventory
+        wait 1 tick
+        if {items.%player%} > 0:
+            send player title "&7You have sold &b%{items.%player%}%" with subtitle "&7For &b$%{price.%player%}% &f(&bx%{_multi}%&f)!" for 2 seconds
+            add {price.%player%} to player's balance
+        else:
+            send "&7You have no items!"
+
+every second:
+    loop all players:
+        if loop-player has permission "rank.VIP":
+            set {donormulti::%loop-player%} to 1.25
+            wait 1 tick
+        else if loop-player has permission "rank.vip+":
+            set {donormulti::%loop-player%} to 1.5
+            wait 1 tick
+        else if loop-player has permission "rank.mvp":
+            set {donormulti::%loop-player%} to 2.0
+            wait 1 tick
+        else if loop-player has permission "rank.mvp+":
+            set {donormulti::%loop-player%} to 2.5
+            wait 1 tick
+        else if loop-player has permission "rank.mvp++":
+            set {donormulti::%loop-player%} to 3.0
+            wait 1 tick
+        else if loop-player has permission "rank.admin":
+            set {donormulti::%loop-player%} to 0
+            wait 1 tick
+        else:
+            set {donormulti::%loop-player%} to 0
+
+every tick:
+    loop all players:
+        if loop-player has permission "rank.admin":
+            set {staffmulti::%loop-player%} to 5
+            set {donormulti::%loop-player%} to 0
+        if loop-player has permission "rank.support":
+            set {staffmulti::%loop-player%} to 3
+            set {donormulti::%loop-player%} to 0
+        else:
+            set {staffmulti::%loop-player%} to 0
+
+command /globalmultiplier [<number>] [<number>]:
+    aliases: /gmulti
+    trigger:
+        if {globalmultiplier.%player%} = 1:
+            if arg-1 > 0:
+                if arg-2 > 0:
+                    broadcast "&e[Global Multiplier] &fThe Global Multiplier (&bx%arg-1%&f) has been set to %arg-2% minutes by %player%!"
+                    set {minutes.globalmultiplier} to arg-2
+                    set {global::multiplier} to arg-1
+                else:
+                    broadcast "&e[Global Multiplier] &fThe Global Multiplier has been shut off!"
+                    set {global::multiplier} to 1
+            else:
+                send "&cIncorrect Usage! /globalmultiplier (multiplier) (time)"
+        else:
+            send "&cYou do not have permission for this!"
+
+every second:
+    if {minutes.globalmultiplier} >= 0:
+        if {seconds.globalmultiplier} > 0:
+            remove 1 from {seconds.globalmultiplier}
+        else:
+            remove 1 from {minutes.globalmultiplier}
+            set {seconds.globalmultiplier} to 59
+    else:
+        set {global::multiplier} to 1
+        if {seconds.globalmultiplier} = 0:
+            broadcast "&e[Global Multiplier] &fThe Global Multiplier has been shut off!"
+            set {seconds.globalmultiplier} to 59
+
+command /multi [<player>]:
+    aliases: /multiplier
+    trigger:
+        if arg-1 is set:
+            send "&c[Multiplier] &fRegular Multi of %arg-1%: %{multiplier::%arg-1%} + 0.25*{Prestiges.%arg-1%} + 100*{Rebirths.%player%}%"
+            send "&c[Multiplier] &fDonor Multiplier of %arg-1%: %{donormulti::%arg-1%}%"
+            send "&c[Multiplier] &fStaff Multiplier of %arg-1%: %{staffmulti::%arg-1%}%"
+        else:
+            send "&c[Multiplier] &fRegular Multi: %{multiplier::%player%} + 0.25*{Prestiges.%player%} + 100*{Rebirths.%player%}%"
+            send "&c[Multiplier] &fDonor Multiplier: %{donormulti::%player%}%"
+            send "&c[Multiplier] &fStaff Multiplier: %{staffmulti::%player%}%"
+            send "&c[Multiplier] &fGlobal Multiplier: x%{global::multiplier}% for %{minutes.globalmultiplier}% minutes and %{seconds.globalmultiplier}% seconds."
