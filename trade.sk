@@ -1,0 +1,186 @@
+- Includes spy mode & trade guard.
+
+function opengui(for: player, other: player):
+	close {_for}'s inventory
+	set {tradeready.%{_for}%} to 0
+	set {trade.%{_for}%} to {_other}
+	set {trading.%{_for}%} to true
+	send "&3Opened trade window with %{_other}%"  to {_for}
+	open "chest" with 4 rows named "&4%{_for}% and %{_other}%" to {_for}
+	drawStage({_for},0)
+	set slot 13 of {_for}'s current inventory to gray glass pane named " &r "
+	set slot 22 of {_for}'s current inventory to green wool named "&aAccept trade"
+	set slot 31 of {_for}'s current inventory to red wool named "&cCancel trade"
+
+function drawStage(for: player,stage: number):
+	if {_stage} is 0:	
+		set {_info} to gray wool named "&6Info"
+	if {_stage} is 1:	
+		set {_info} to yellow wool named "&6Info"
+	if {_stage} is 2:
+		set {_info} to light green wool named "&6Info"
+	set line 1 of {_info}'s lore to "&r&eGray: waiting for both"
+	set line 2 of {_info}'s lore to "&r&eYellow: waiting for you"
+	set line 3 of {_info}'s lore to "&r&eGreen: waiting for them"
+	set slot 4 of {_for}'s current inventory to {_info}
+
+function drawInventory(for: player,other: player):
+#ME
+	set {tradeready.%{_for}%} to 0
+	set {tradeready.%{_other}%} to 0
+	set {_x} to 0
+	set {_y} to 0
+	loop {tradelist.%{_for}%::*}:
+		set slot {_x}+{_y}*9 of {_for}'s current inventory to {tradelist.%{_for}%::%loop-index%}
+#		broadcast "&ax%{_x}%y%{_y}% -- %{tradelist.%{_for}%::%loop-index%}%"
+		add 1 to {_x}
+		if {_x} is more than 3:
+			set {_x} to 0
+			add 1 to {_y}
+	loop (16 - {_x}) - {_y}*4 times:
+		set slot {_x}+{_y}*9 of {_for}'s current inventory to air
+#		broadcast "&bx%{_x}%y%{_y}%"
+		add 1 to {_x}
+		if {_x} is more than 3:
+			set {_x} to 0
+			add 1 to {_y}
+#YOU
+	set {_x} to 0
+	set {_y} to 0
+	loop {tradelist.%{_other}%::*}:
+		set slot {_x}+5+{_y}*9 of {_for}'s current inventory to {tradelist.%{_other}%::%loop-index%}
+#		broadcast "&ax%{_x}+5%y%{_y}% -- %{tradelist.%{_other}%::%loop-index%}%"
+		add 1 to {_x}
+		if {_x} is more than 3:
+			set {_x} to 0
+			add 1 to {_y}
+	loop (16 - {_x}) - {_y}*4 times:
+		set slot {_x}+5+{_y}*9 of {_for}'s current inventory to air
+#		broadcast "&bx%{_x}+5%y%{_y}%"
+		add 1 to {_x}
+		if {_x} is more than 3:
+			set {_x} to 0
+			add 1 to {_y}
+		drawStage({_for},0)
+		drawStage({_other},0)
+	
+function doTrade(for: player,other: player):
+	set {trading.%{_for}%} to false
+	set {trading.%{_other}%} to false
+	send "&3Trade successful with %{_other}%" to {_for}
+	loop {tradelist.%{_other}%::*}:
+		give {tradelist.%{_other}%::%loop-index%} to {_for}	
+#		broadcast "%loop-index% - %loop-value%"
+	delete {tradelist.%{_other}%::*}
+	close {_for}'s inventory
+	
+function initiateTrade(for: player, other: player):	
+	if {_other} is {_for}:
+		send "&3You silly ^^" to {_for}
+		exit
+	send "&3Sent trade request to %{_other}%" to {_for}
+	if {trading.%{_other}%} is not set:
+		set {trading.%{_other}%} to false
+	if {trading.%{_other}%} is not true:
+		{trade.%{_for}%} is {_other}
+		if {tradetimer.%{_for}%} was less than 30 seconds ago:
+			opengui({_for},{trade.%{_for}%})
+			opengui({trade.%{_for}%},{_for})
+			delete {tradetimer.%{_for}%}
+			exit
+	else:
+		send "&cThat person is busy" to {_for}
+		exit
+	if {trading.%{_other}%} is true:
+		send "&cThat person is busy" to {_for}
+		exit
+	json("%{_other}%","&3&n%{_for}'s name% wants to trade with you||ttp:&bClick to trade with %{_for}%||cmd:/trade %{_for}%")
+	set {trade.%{_other}%} to {_for}
+	set {tradetimer.%{_other}%} to now
+
+command /trade [<player>]:
+	executable by: players
+	trigger:
+		if arg-1 is set:
+			initiateTrade(player,arg-1)
+		else:
+			if {trade.%player%} is set:
+				if {trading.%{trade.%player%}%} is not true:
+					if {tradetimer.%player%} was less than 30 seconds ago:
+						opengui(player,{trade.%player%})
+						opengui({trade.%player%},player)
+						delete {tradetimer.%player%}
+					else:
+						if {tradetimer.%player%} was less than 1 hour ago:
+							send "&cTrade timed out with %{trade.%player%}%" to player
+						else:
+							send "&cUsage: &o/trade <player>" to player
+				else:
+					send "&cThat person is busy" to player
+			else:
+				send "&cUsage: &o/trade <player>" to player
+
+on right click on player:
+	player is sneaking
+	set {_other} to clicked player
+	if {trade.%{_other}%} is player:
+		if {tradetimer.%player%} was less than 30 seconds ago:
+			opengui(player,{trade.%player%})
+			opengui({trade.%player%},player)
+			delete {tradetimer.%player%}
+	if {tradestamp.%player%} was less than 2 seconds ago:
+		initiateTrade(player,{_other})
+		delete {tradestamp.%player%}
+	else:
+		send "&bSneak rightclick again to send trade request" to player
+		set {tradestamp.%player%} to now
+		
+on inventory click:
+	{trading.%player%} is true
+	cancel event
+	"%clicked action%" is "pickup all"
+	if "%clicked inventory%" is "inventory of <none>":
+		# TRADE INVENTORY
+		if clicked slot is 31: 
+			close player's inventory
+		else if clicked slot is 22:
+			if {tradeready.%{trade.%player%}%} is 0:
+				set {tradeready.%player%} to 1
+				drawStage(player,2)
+				drawStage({trade.%player%},1)
+			if {tradeready.%{trade.%player%}%} is 1:
+				log "[%player% traded %{trade.%player%}%] %{tradelist.%player%::*}% //and got back// %{tradelist.%{trade.%player%}%::*}%" to file "trade.log"
+				doTrade(player,{trade.%player%})
+				doTrade({trade.%player%},player)
+		else:
+			set {_slt} to clicked slot +1
+			while {_slt} is more than 4:
+				remove 9 from {_slt}
+				if {_slt} is less than 1:
+					exit
+			give player clicked item
+			remove clicked item from {tradelist.%player%::*}
+			set slot clicked slot of player's current inventory to air
+			drawInventory(player,{trade.%player%})
+			drawInventory({trade.%player%},player)
+	else if clicked inventory is player's inventory:
+		# PLAYER INVENTORY
+		clicked item exists
+		clicked item is not air
+		if size of {tradelist.%player%::*} is less than 16:
+			add clicked item to {tradelist.%player%::*}
+			remove clicked item from inventory of player
+			drawInventory(player,{trade.%player%})
+			drawInventory({trade.%player%},player)
+		else:
+			send "&cSlots full" to player
+		
+on inventory close:
+	{trading.%player%} is true
+	send "&cTrading interrupted" to player
+	set {trading.%player%} to false
+	if {trading.%{trade.%player%}%} is true: 
+		close {trade.%player%}'s inventory
+	loop {tradelist.%player%::*}:
+		give player {tradelist.%player%::%loop-index%}
+	delete {tradelist.%player%::*}
