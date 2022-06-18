@@ -1,0 +1,22 @@
+command /autosell [<text>]:
+    trigger:
+        if player has permission "autosell.use":
+            if argument 1 is set:
+                if argument 1 is "off":
+                    set {autosell.%player%} to false
+                    message "&bAutosell&8> &cFalse"
+                else if argument 1 is "on":
+                    set {autosell.%player%} to true
+                    message "&bAutosell&8> &7True"
+            else:
+                if {autosell.%player%} is true:
+                    set {autosell.%player%} to false
+                    message "&bAutosell&8> &cFalse"
+                else:
+                    set {autosell.%player%} to true
+                    message "&bAutosell&8> &7True"
+            while {autosell.%player%} is true:
+                make player execute command "sell all"
+                wait {@waitingtimeinseconds} second
+        else:
+            message "&8You do not have permission for this!"
