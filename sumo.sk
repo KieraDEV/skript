@@ -1,0 +1,154 @@
+command /sumoreset:
+	trigger:
+		if player has permission "practice.admin":
+			loop all players:
+				set {sumorequest.%player%} to false
+				set {gamestart} to 0
+				set {inqueue} to 0
+				teleport loop-player to {hub}
+				clear loop-player's inventory
+				set loop-player's gamemode to adventure
+
+
+command /sumo [<offline player>]:
+	trigger:
+		if arg 1 is not "%player%":
+			if arg 1 is not set:
+				send "&7&m+----------+"
+				send "&3"
+				send "&e&o/Sumo <player> &8- &7&oThis challenges another player that you select."
+				send "&4"
+				send "&7&m+----------+"
+			if arg 1 is "%player%":
+				send "&7&m+----------+"
+				send "&3"
+				send "&e&o/Sumo <player> &8- &7&oThis challenges another player that you select."
+				send "&4"
+				send "&7&m+----------+"
+			if arg 1 is set:
+				if {gamestart} is 0:
+					send "&7&oYou have just &7&n&oCHALLENGED &7&o%arg 1%"
+					send "&7&oYou have &7&n&o30 Seconds &7&oto accept %player%'s sumo request. Do /sumoaccept <player> to accept the opponents sumo." to arg 1
+					set {sumorequest.%player%} to true
+					wait 30 seconds
+					set {sumorequest.%player%} to false
+				if {gamestart} is 1:
+					send "&c&oThere is &c&n&oalready &7&oa game started!"
+		else:
+			send "&cYou cannot sumo yourself. Why? Because UpdateVersion said so."
+
+command /spectate:
+	trigger:
+		teleport player to {waiting}
+		send "&7&oYou have just been teleported to waiting area."
+
+command /sumoaccept [<offline player>]:
+	trigger:
+		if arg 1 is set:
+			if {sumorequest.%arg 1%} is true:
+				if {gamestart} is 0:
+					send "&7&oYou have just accepted %arg 1%'s sumo!"
+					send "&7&oYou have just been accepted to %player%'s sumo!" to arg 1
+					add 1 to {game::%player%}
+					add 1 to {game::%arg 1%}
+					add 1 to {gamestart}
+					teleport player to {spawn1}
+					teleport arg 1 to {spawn2}
+					clear player's inventory
+					clear arg 1's inventory
+					set player's gamemode to adventure
+					set arg 1's gamemode to adventure
+					set {gamestart} to 1
+				if {gamestart} is 1:
+					send "&c&oThere is &c&n&oalready &7&oa game started!"
+
+command /setspawn [<text>]:
+	trigger:
+		if player has permission "pratice.admin":
+			if arg 1 is not set:
+				send "&7&m+----------+"
+				send "&3"
+				send "&7&o/Setspawn 1/2 &8- &eSets the spawn for the spawnpoints of the players."
+				send "&7&o/Setspawn Hub &8- &eSets the hub for all of the players."
+				send "&4"
+				send "&7&m+----------+"
+			if arg 1 is "1":
+				set {spawn1} to player's location
+				send "&7&oYou have just set &7&n&oSPAWN 1 &7&oof the arena."
+			if arg 1 is "2":
+				set {spawn2} to player's location
+				send "&7&oYou have just set &7&n&oSPAWN 2 &7&oof the arena."
+			if arg 1 is "hub":
+				set {hub} to player's location
+				send "&7&oYou have just set &7&n&oHUB &7&oof the world."
+			if arg 1 is "waiting":
+				set {waiting} to player's location
+				send "&7&oYou have just set &7&n&oWAITING &7&oof the world."
+
+#on death:
+	#if {gamestart} is 1:
+		#if {game.%player%} is 1:
+			#broadcast "&7&o&n%victim% &7&ohas just fallen in battle"
+			#loop {game::%player%}:
+				#set {gamestart} to 0
+				#add 1 to {wins.%attacker%}
+				#heal attacker
+				#add 1 to {wins.%attacker's UUID%} 
+				#add 1 to {losses.%victim's UUID%}
+				#make loop-player execute command "spawn"
+				#set {game::%loop-player%} to 0
+				#give loop-player a light green dye named "&aTurn On &8[&a&oPlayers&8]" with lore "&7&o(RIGHT-CLICK)"
+				#give loop-player a gray dye named "&aTurn Off &8[&a&oPlayers&8]" with lore "&7&o(RIGHT-CLICK)"
+
+on death of player:
+	if {gamestart} is 1:
+		if {game::%player%} is 1:
+			broadcast "&7&o&n%victim% &7&ohas just fallen in battle"
+			loop all players:
+				set {gamestart} to 0
+				heal loop-player
+				make loop-player execute command "spawn"
+				set {game::%loop-player%} to 0
+				wait 10 seconds
+				clear loop-player's inventory
+				give loop-player a book named "&aJoin" with lore "||&7&o(RIGHT-CLICK)||"
+
+on quit:
+	if {gamestart} is 1:
+		if {game::%player%} is 1:
+			broadcast "&7&o&n%player% &7&ohas just fallen in battle"
+			loop all players:
+				set {gamestart} to 0
+				make loop-player execute command "spawn"
+				set {game::%loop-player%} to 0
+				wait 10 seconds
+				clear loop-player's inventory
+				give loop-player a book named "&aJoin" with lore "||&7&o(RIGHT-CLICK)||"
+
+command /invsee [<offline player>]:
+	trigger:
+		open the arg 1's inventory for the player
+
+on first join:
+	give player a book named "&aJoin" with lore "||&7&o(RIGHT-CLICK)||"
+
+command /reset:
+	trigger:
+		clear player's inventory
+		give player a book named "&aJoin" with lore "||&7&o(RIGHT-CLICK)||"
+
+on right click:
+	if player is holding book:
+		open chest with 6 rows named "&a&n&oQUEUE" to player
+		wait 2 ticks
+		format slot 10 of player with enchanted_book named "&a&o&nSumo" with lore "||&7&o(LEFT-CLICK)||" to close then run [getRandom(player)]
+
+function getRandom(p: player):
+	loop all players:
+		if loop-player's name is not "%{_p}%":
+			add loop-player to {choose::*}
+			set {_sumoPlayer} to a random player out of {choose::*}
+			make {_p} execute command "sumo %{_sumoPlayer}%"
+			delete {choose::*}
+      
+- Sumo Gamemode (2021)
