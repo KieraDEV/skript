@@ -1,0 +1,160 @@
+#Don't edit this part.	
+
+	prefix: &8[&6Random&aTP&8] #The prefix of the skript
+	version: 1.0 #The version of skript
+	
+#If you are noob in skript, don't edit this!	
+
+on sign change:
+	if player has permission "randomtp.sign.create":
+		if line 2 of block is "[RTP]":
+			set line 1 of block to "{@SignLine1}"
+			set line 2 of block to "{@SignLine2}"
+			set line 3 of block to "{@SignLine3}"
+			set line 4 of block to "{@SignLine4}"
+	else:
+		send "{@permissionmsg}"
+on rightclick on sign:
+	if line 1 of block is "{@SignLine1}":
+		if player has permission "randomtp.sign.use":
+			if world is not {@worlds}:
+				loop all players:
+					set {_world} to the world of loop-player
+				send "{@noworldmsg}"
+			else:
+				if difference between {cooldowns::rtp::%player%} and now < {@cooldown}:
+					send "{@cooldownmsg}"
+				else:
+					set {_loc::old} to player's location
+					while player's location is {_loc::old}:
+						set {_loc::new} to location at random number between {@min.x} and {@max.x}, 0, random number between {@min.z} and {@max.z}
+						loop blocks above {_loc::new}:
+							if loop-block and block above loop-block are air:
+								if block under loop-block is not {@avoid}:
+									set {_loc::new} to location of loop-block
+									set {_biome} to biome at {_loc::new}
+									teleport the player to {_loc::new}
+									if light level at player <= 2:
+										set block at player to ground torch
+									set {cooldowns::rtp::%player%} to now
+									send "{@teleportmsg}"
+									send player title "{@teleporttitle}" with subtitle "{@teleportsubtitle}" for {@tstay} with {@tfadein} fade in and {@tfadeout} fade out
+									send "{@teleportmsg2}"
+									stop loop
+						wait 10 ticks
+		else:
+			send "{@permissionmsg}"
+
+command /randomtp [<text>]:
+	aliases: rtp 
+	permission: randomtp.cmd.use
+	description: Main command
+	trigger:
+		if argument 1 is not set:
+			if executor is console:
+				send "&cOnly players execute this command&8!"
+			if executor is player:
+				if player has permission "randomtp.cmd.rtp":
+					if world is not {@worlds}:
+						loop all players:
+							set {_world} to the world of loop-player
+						send "{@noworldmsg}"
+					else:
+						if difference between {cooldowns::rtp::%player%} and now < {@cooldown}:
+							send "{@cooldownmsg}"
+						else:
+							set {_loc::old} to player's location
+							while player's location is {_loc::old}:
+								set {_loc::new} to location at random number between {@min.x} and {@max.x}, 0, random number between {@min.z} and {@max.z}
+								loop blocks above {_loc::new}:
+									if loop-block and block above loop-block are air:
+										if block under loop-block is not {@avoid}:
+											set {_loc::new} to location of loop-block
+											set {_biome} to biome at {_loc::new}
+											teleport the player to {_loc::new}
+											if light level at player <= 2:
+												set block at player to ground torch
+											set {cooldowns::rtp::%player%} to now
+											send "{@teleportmsg}"
+											send player title "{@teleporttitle}" with subtitle "{@teleportsubtitle}" for {@tstay} with {@tfadein} fade in and {@tfadeout} fade out
+											send "{@teleportmsg2}"
+											stop loop
+								wait 10 ticks
+				else:
+					send "{@permissionmsg}"
+			
+		if argument 1 is "help":
+			if executor is console:
+				send "&7---------------&fRandom&4TP &cHelp&7---------------" 
+				send "&f/&frtp go &cThis command is for teleport a random location"
+				send "&f/&frtp help &cShow help"
+				send "&f/&frtp unstuck &cUnstuck a bugged player :D" 
+				send "&f/&frtp sign &cThis command show instruction for create sign"
+				send "&f/&frtp credits &cShow the credits"
+				send "&f/&frtp worldlist &cThis is worldlist are permitted"
+				send "&7------------------------------------------"
+			if executor is player:
+				if player has permission "randomtp.cmd.go" or "randomtp.cmd.unstuck" or "randomtp.sign.create" or "randomtp.cmd.worldlist":
+					send "&7---------------&6Random&aTP &cHelp&7---------------" 
+					if player has permission "randomtp.cmd.go":
+						send "&f/&artp go &cThis command is for teleport a random location"
+					send "&f/&artp help &cShow help"
+					if player has permission "randomtp.cmd.unstuck":
+						send "&f/&artp unstuck &cUnstuck a bugged player :D" 
+					if player has permission "randomtp.sign.create":
+						send "&f/&artp sign &cThis command show instruction for create sign"
+					send "&f/&artp credits &cShow the credits"
+					if player has permission "randomtp.cmd.worldlist":
+						send "&f/&artp worldlist &cThis is worldlist are permitted"
+					send "&7------------------------------------------"
+				else:
+					send "{@permissionmsg}"
+		if argument 1 is "sign":
+			if executor is console:
+				send "&7------------------------------------------"
+				send "{@prefix} &81. &7Place a sign."
+				send "{@prefix} &82. &7Write in second line of sign &5'&6[RTP]&5'"
+				send "{@prefix} &83. &7In skript you can edit lines of sign."
+				send "{@prefix} &84. &7Click in sign to use :D."
+				send "&7------------------------------------------"
+			if executor is player:
+				if player has permission "randomtp.sign.create":
+					send "&7------------------------------------------"
+					send "{@prefix} &81. &7Place a sign."
+					send "{@prefix} &82. &7Write in second line of sign &5'&6[RTP]&5'"
+					send "{@prefix} &83. &7In skript you can edit lines of sign."
+					send "{@prefix} &84. &7Click in sign to use :D."
+					send "&7------------------------------------------"
+		if argument 1 is "unstuck":
+			if executor is console:
+				send "&cOnly players execute this command&8!"
+			if executor is player:
+				if player has permission "randomtp.cmd.unstuck":
+					if difference between {cooldowns::rtp::%player%} and now < {@cooldownus}:
+						send "{@cooldownusmsg}"
+					else:
+						set {_loc} to location of block at player
+						set y-coordinate of {_loc} to 256
+						set {_n} to 0
+						loop 255 times:
+							set {_n} to {_n}+1
+							block {_n} below block at {_loc} is not air
+							set {_n} to {_n}-1
+							teleport player to block {_n} below block at {_loc}
+							set {cooldowns::rtp::%player%} to now
+						send "&aYou are unstucked :D"
+						stop 
+				else:
+					send "{@permissionmsg}"
+		if argument 1 is "credits":
+			send "{@prefix} &eCreated by&6: &aDistray"
+		if argument 1 is "worldlist":
+			if executor is console:
+				send "{@prefix} {@worldpermittedare}:"
+				send "{@worldlist}"
+			if executor is player:
+				if player has permission "randomtp.cmd.worldlist":
+					send "{@prefix} {@worldpermittedare}:"
+					send "{@worldlist}"
+				else:
+					send "{@permissionmsg}"
