@@ -1,0 +1,21 @@
+every 5 seconds in "world":
+    loop all players:
+        wipe loop-player's sidebar
+        set name of sidebar of loop-player to "&c&"
+        set score "&a" in sidebar of loop-player to 21
+        set score "&4&l         &nYour Stats" in sidebar of loop-player to 20
+        set score "&c" in sidebar of loop-player to 19
+        set score "&4 - Kills&8: {totalkills.%player%} to 18
+        set score "&4 - Deaths&8: {totaldeaths.%player%} to 17
+        set score "&4 - &cRank&8: %colored loop-player's prefix%" in sidebar of loop-player to 16
+        set score "&4 - &cName&8: %loop-player's name%" in sidebar of loop-player to 15
+        set score "&4 - &cBalance&8: &a%loop-player's balance%" in sidebar of loop-player to 14
+        set score "&f" in sidebar of loop-player to 13
+        set score "&4&l         &nServer Info" in sidebar of loop-player to 12
+        set score "&b" in sidebar of loop-player to 11
+        set score "&4 - &cOnline Players&8: &f%amount of players%" in sidebar of loop-player to 10
+        set score "&4 - &cDiscord&8: &f/discord" in sidebar of loop-player to 9
+        set score "&4 - &cIP&8: &7Example.com" in sidebar of loop-player to 8
+        set score "&4" in sidebar of loop-player to 7	
+        
+- This was for skRayfall, may still work in 1.18.
