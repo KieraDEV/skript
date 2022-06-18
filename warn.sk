@@ -57,3 +57,20 @@ command /revert-warn [<offline player>] [<text>]:
                 send "&c&lWARNS &8» &c%arg-1% &7has no warnings!"
         else:
             send "&c&lWARNS &8» &7Usage: &e/revert-warn <player> [-s]"
+
+command /check [<offline player>]:
+    permission: rank.helper
+    permission message: &cInsufficient Permissions.
+    trigger:
+        if argument 1 is not set:
+            send "&c&lMineEdge &8» &7Please specify a player to check."
+        else:
+            send "&c&lMineEdge &8» &7Showing information for &c%arg-1%&7:"
+            send ""
+            if {warns.%arg-1%} is greater than 0:
+                send "&cWarnings: &f%{warns.%arg-1%}%"
+                send "&cWarn Reasons: &f%{warnreasons.%arg-1%::*}%"
+                send "&6Note: &eSome warnings may be reverted."
+            else:
+                send "&cWarnings: &f0"
+                send "&cWarn Reasons: &fNone"
